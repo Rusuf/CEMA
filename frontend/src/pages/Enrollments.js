@@ -20,6 +20,7 @@ const Enrollments = () => {
     try {
       setLoading(true);
       const response = await clientsApi.getAll(search);
+      console.log("Clients data:", response.data);
       setClients(response.data);
     } catch (error) {
       console.error('Error fetching clients:', error);
@@ -40,7 +41,7 @@ const Enrollments = () => {
   // Create a processed list of clients with programs they're enrolled in
   const processedClients = clients.map(client => {
     const programNames = client.enrollments && client.enrollments.length > 0
-      ? client.enrollments.map(e => e.program && e.program.name).filter(name => name).join(', ')
+      ? client.enrollments.map(e => e.program_name).filter(name => name).join(', ')
       : 'None';
     
     return {

@@ -2,14 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../components/common/Card';
 import Table from '../components/common/Table';
-import Button from '../components/common/Button';
 import Input from '../components/common/Input';
+import PageHeader from '../components/common/PageHeader';
+import FormContainer from '../components/common/FormContainer';
+import SearchBar from '../components/common/SearchBar';
+import useFetch from '../hooks/useFetch';
 import { clientsApi } from '../services/api';
 
 const Clients = () => {
   const navigate = useNavigate();
-  const [clients, setClients] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: clients, loading, execute } = useFetch([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -27,6 +29,13 @@ const Clients = () => {
       cell: (row) => new Date(row.date_of_birth).toLocaleDateString()
     },
     { header: 'Contact Info', accessor: 'contact_info' },
+    {
+      header: 'Programs Enrolled',
+      accessor: 'enrollments',
+      cell: (row) => row.enrollments && row.enrollments.length > 0
+        ? row.enrollments.map(e => e.program_name).join(', ')
+        : 'Not enrolled'
+    },
   ];
 
   useEffect(() => {
@@ -34,20 +43,11 @@ const Clients = () => {
   }, []);
 
   const fetchClients = async (search = '') => {
-    try {
-      setLoading(true);
-      const response = await clientsApi.getAll(search);
-      setClients(response.data);
-    } catch (error) {
-      console.error('Error fetching clients:', error);
-    } finally {
-      setLoading(false);
-    }
+    await execute(clientsApi.getAll, search);
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    fetchClients(searchTerm);
+  const handleSearch = (term) => {
+    fetchClients(term);
   };
 
   const handleInputChange = (e) => {
@@ -67,71 +67,66 @@ const Clients = () => {
     }
   };
 
+  const handleToggleForm = () => {
+    setShowForm(!showForm);
+  };
+
   const handleViewClient = (client) => {
     navigate(`/clients/${client.id}`);
   };
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
-          <p className="text-gray-600">Manage clients in the system</p>
-        </div>
-        <Button onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Cancel' : 'Register Client'}
-        </Button>
-      </div>
+      <PageHeader 
+        title="Clients"
+        subtitle="Manage clients in the system"
+        showAction={true}
+        actionText={showForm ? 'Cancel' : 'Register Client'}
+        onActionClick={handleToggleForm}
+      />
 
       {showForm && (
-        <Card title="Register New Client" className="mb-6">
-          <form onSubmit={handleSubmit}>
-            <Input
-              label="Client Name"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              placeholder="Enter client name"
-              required
-            />
-            <Input
-              label="Date of Birth"
-              id="date_of_birth"
-              name="date_of_birth"
-              type="date"
-              value={formData.date_of_birth}
-              onChange={handleInputChange}
-              required
-            />
-            <Input
-              label="Contact Information"
-              id="contact_info"
-              name="contact_info"
-              value={formData.contact_info}
-              onChange={handleInputChange}
-              placeholder="Enter contact information"
-            />
-            <div className="flex justify-end">
-              <Button type="submit">Save Client</Button>
-            </div>
-          </form>
-        </Card>
+        <FormContainer 
+          title="Register New Client" 
+          onSubmit={handleSubmit}
+          onCancel={handleToggleForm}
+          submitText="Save Client"
+        >
+          <Input
+            label="Client Name"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            placeholder="Enter client name"
+            required
+          />
+          <Input
+            label="Date of Birth"
+            id="date_of_birth"
+            name="date_of_birth"
+            type="date"
+            value={formData.date_of_birth}
+            onChange={handleInputChange}
+            required
+          />
+          <Input
+            label="Contact Information"
+            id="contact_info"
+            name="contact_info"
+            value={formData.contact_info}
+            onChange={handleInputChange}
+            placeholder="Enter contact information"
+          />
+        </FormContainer>
       )}
 
-      <Card className="mb-6">
-        <form onSubmit={handleSearch} className="flex space-x-4">
-          <Input
-            id="search"
-            name="search"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by name or contact info"
-            className="mb-0 flex-1"
-          />
-          <Button type="submit">Search</Button>
-        </form>
-      </Card>
+      <SearchBar 
+        value={searchTerm}
+        onChange={setSearchTerm}
+        onSearch={handleSearch}
+        placeholder="Search by name or contact info"
+      />
 
       <Card>
         {loading ? (
@@ -139,7 +134,7 @@ const Clients = () => {
         ) : (
           <Table 
             columns={columns} 
-            data={clients}
+            data={clients || []}
             onRowClick={handleViewClient}
           />
         )}

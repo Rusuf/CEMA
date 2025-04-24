@@ -4,21 +4,23 @@ import Card from '../components/common/Card';
 import Button from '../components/common/Button';
 import Table from '../components/common/Table';
 import Input from '../components/common/Input';
+import PageHeader from '../components/common/PageHeader';
+import FormContainer from '../components/common/FormContainer';
+import useFetch from '../hooks/useFetch';
 import { clientsApi, programsApi, enrollmentsApi } from '../services/api';
 
 const ClientDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [client, setClient] = useState(null);
-  const [programs, setPrograms] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: client, loading, execute: fetchClient } = useFetch(null);
+  const { data: programs = [], execute: fetchPrograms } = useFetch([]);
   const [showEnrollForm, setShowEnrollForm] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState('');
   const [enrollmentDate, setEnrollmentDate] = useState(new Date().toISOString().split('T')[0]);
 
   const enrollmentColumns = [
     { header: 'Program ID', accessor: 'program_id' },
-    { header: 'Program Name', accessor: 'program.name' },
+    { header: 'Program Name', accessor: 'program_name' },
     { 
       header: 'Enrollment Date', 
       accessor: 'enrollment_date',
@@ -26,23 +28,16 @@ const ClientDetail = () => {
     }
   ];
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const clientResponse = await clientsApi.getById(id);
-        setClient(clientResponse.data);
-        
-        const programsResponse = await programsApi.getAll();
-        setPrograms(programsResponse.data);
-      } catch (error) {
-        console.error('Error fetching client details:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchClientData = async () => {
+    await fetchClient(clientsApi.getById, id);
+  };
 
-    fetchData();
+  useEffect(() => {
+    const loadData = async () => {
+      await fetchClientData();
+      await fetchPrograms(programsApi.getAll);
+    };
+    loadData();
   }, [id]);
 
   const handleEnroll = async (e) => {
@@ -55,17 +50,20 @@ const ClientDetail = () => {
         enrollment_date: enrollmentDate
       });
       
-      // Refresh client data to show the new enrollment
-      const clientResponse = await clientsApi.getById(id);
-      setClient(clientResponse.data);
-      
       // Reset form
       setSelectedProgram('');
       setEnrollmentDate(new Date().toISOString().split('T')[0]);
       setShowEnrollForm(false);
+      
+      // Refresh client data to show the new enrollment
+      fetchClientData();
     } catch (error) {
       console.error('Error enrolling client:', error);
     }
+  };
+
+  const handleToggleEnrollForm = () => {
+    setShowEnrollForm(!showEnrollForm);
   };
 
   if (loading) {
@@ -89,17 +87,14 @@ const ClientDetail = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Client Details</h1>
-          <p className="text-gray-600">
-            Viewing profile for {client.name}
-          </p>
-        </div>
-        <Button variant="outline" onClick={() => navigate('/clients')}>
-          Back to Clients
-        </Button>
-      </div>
+      <PageHeader 
+        title="Client Details"
+        subtitle={`Viewing profile for ${client.name}`}
+        showAction={true}
+        actionText="Back to Clients"
+        actionVariant="outline"
+        onActionClick={() => navigate('/clients')}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card className="md:col-span-2">
@@ -134,7 +129,7 @@ const ClientDetail = () => {
           <div className="space-y-2">
             <Button
               className="w-full"
-              onClick={() => setShowEnrollForm(!showEnrollForm)}
+              onClick={handleToggleEnrollForm}
             >
               {showEnrollForm ? 'Cancel' : 'Enroll in Program'}
             </Button>
@@ -143,41 +138,41 @@ const ClientDetail = () => {
       </div>
 
       {showEnrollForm && (
-        <Card title="Enroll in Health Program" className="mb-6">
-          <form onSubmit={handleEnroll}>
-            <div className="mb-4">
-              <label htmlFor="program" className="block text-sm font-medium text-gray-700 mb-1">
-                Select Program <span className="text-red-500">*</span>
-              </label>
-              <select
-                id="program"
-                value={selectedProgram}
-                onChange={(e) => setSelectedProgram(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                required
-              >
-                <option value="">Select a program</option>
-                {programs.map((program) => (
-                  <option key={program.id} value={program.id}>
-                    {program.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <Input
-              label="Enrollment Date"
-              id="enrollmentDate"
-              name="enrollmentDate"
-              type="date"
-              value={enrollmentDate}
-              onChange={(e) => setEnrollmentDate(e.target.value)}
+        <FormContainer 
+          title="Enroll in Health Program" 
+          onSubmit={handleEnroll}
+          onCancel={handleToggleEnrollForm}
+          submitText="Enroll Client"
+        >
+          <div className="mb-4">
+            <label htmlFor="program" className="block text-sm font-medium text-gray-700 mb-1">
+              Select Program <span className="text-red-500">*</span>
+            </label>
+            <select
+              id="program"
+              value={selectedProgram}
+              onChange={(e) => setSelectedProgram(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
               required
-            />
-            <div className="flex justify-end">
-              <Button type="submit">Enroll Client</Button>
-            </div>
-          </form>
-        </Card>
+            >
+              <option value="">Select a program</option>
+              {programs.map((program) => (
+                <option key={program.id} value={program.id}>
+                  {program.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <Input
+            label="Enrollment Date"
+            id="enrollmentDate"
+            name="enrollmentDate"
+            type="date"
+            value={enrollmentDate}
+            onChange={(e) => setEnrollmentDate(e.target.value)}
+            required
+          />
+        </FormContainer>
       )}
 
       <Card title="Program Enrollments">

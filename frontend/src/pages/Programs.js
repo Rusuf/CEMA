@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../components/common/Card';
 import Table from '../components/common/Table';
-import Button from '../components/common/Button';
 import Input from '../components/common/Input';
+import PageHeader from '../components/common/PageHeader';
+import FormContainer from '../components/common/FormContainer';
+import useFetch from '../hooks/useFetch';
 import { programsApi } from '../services/api';
 
 const Programs = () => {
-  const [programs, setPrograms] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: programs, loading, execute } = useFetch([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -25,15 +26,7 @@ const Programs = () => {
   }, []);
 
   const fetchPrograms = async () => {
-    try {
-      setLoading(true);
-      const response = await programsApi.getAll();
-      setPrograms(response.data);
-    } catch (error) {
-      console.error('Error fetching programs:', error);
-    } finally {
-      setLoading(false);
-    }
+    await execute(programsApi.getAll);
   };
 
   const handleInputChange = (e) => {
@@ -53,50 +46,52 @@ const Programs = () => {
     }
   };
 
+  const handleToggleForm = () => {
+    setShowForm(!showForm);
+  };
+
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Programs</h1>
-          <p className="text-gray-600">Manage health programs in the system</p>
-        </div>
-        <Button onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Cancel' : 'Add Program'}
-        </Button>
-      </div>
+      <PageHeader 
+        title="Programs"
+        subtitle="Manage health programs in the system"
+        showAction={true}
+        actionText={showForm ? 'Cancel' : 'Add Program'}
+        onActionClick={handleToggleForm}
+      />
 
       {showForm && (
-        <Card title="Add New Program" className="mb-6">
-          <form onSubmit={handleSubmit}>
-            <Input
-              label="Program Name"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              placeholder="Enter program name"
-              required
-            />
-            <Input
-              label="Description"
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              placeholder="Enter program description"
-            />
-            <div className="flex justify-end">
-              <Button type="submit">Save Program</Button>
-            </div>
-          </form>
-        </Card>
+        <FormContainer 
+          title="Add New Program" 
+          onSubmit={handleSubmit}
+          onCancel={handleToggleForm}
+          submitText="Save Program"
+        >
+          <Input
+            label="Program Name"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            placeholder="Enter program name"
+            required
+          />
+          <Input
+            label="Description"
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
+            placeholder="Enter program description"
+          />
+        </FormContainer>
       )}
 
       <Card>
         {loading ? (
           <p className="text-center py-4">Loading programs...</p>
         ) : (
-          <Table columns={columns} data={programs} />
+          <Table columns={columns} data={programs || []} />
         )}
       </Card>
     </div>
