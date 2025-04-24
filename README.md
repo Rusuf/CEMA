@@ -1,52 +1,42 @@
-# CEMA BHIS - My Health Information System Project 🏥
+# CEMA - Basic Health Information System
 
-I built this lightweight health information system to help healthcare providers manage their clients and health programs effectively. It streamlines workflows while keeping everything secure and user-friendly.
+A lightweight health information system for managing clients and health programs/services. Designed to streamline healthcare workflows while maintaining data security and usability.
 
-## 💡 What I Created
-
-CEMA BHIS (Basic Health Information System) is a solution I developed to tackle healthcare data management challenges. I wanted to create something practical for real-world use while demonstrating clean code principles and an API-first approach.
-
-## 🔑 Key Features
-
-The system allows healthcare workers to:
-
-1. **🆕 Create health programs** - Set up specialized care programs (TB, Malaria, HIV, etc.)
-2. **👤 Register clients** - Add and manage patient information seamlessly
-3. **📋 Enroll clients in programs** - Connect patients with the care they need
-4. **🔍 Search for clients** - Find patients quickly with a robust search system
-5. **👁️ View client profiles** - See comprehensive patient information including program enrollment
-6. **🔌 Access data via API** - Secure API layer for external system integration
-
-## 🏗️ Project Structure
-
-I organized the project with a clear separation of concerns:
+## Project Structure
 
 ```
-CEMA BHIS/
-├── README.md            # Project overview
-├── backend/             # Python backend implementation
+CEMA/
+├── README.md            # Project overview (this file)
+├── backend/             # Backend code and documentation
 │   ├── .env             # Environment configuration
 │   ├── bhis.db          # SQLite database
-│   ├── docs/            # Documentation
-│   ├── requirements.txt # Dependencies
-│   ├── run.py           # Entry point
-│   ├── scripts/         # Helper scripts
-│   └── src/             # Backend source code
-└── frontend/            # React.js frontend
-    ├── public/          # Static assets
-    ├── src/             # Frontend source
-    ├── package.json     # Dependencies and scripts
-    └── README.md        # Frontend-specific notes
+│   ├── docs/            # Documentation files
+│   ├── requirements.txt # Python dependencies
+│   ├── run.py           # Application entry point
+│   ├── scripts/         # Utility scripts
+│   └── src/             # Source code
+└── frontend/            # Frontend code (to be implemented)
 ```
 
-## 💻 Technology Choices
+## Features
 
-- **Backend**: Python with FastAPI for performance and simplicity
-- **Database**: SQLite for development (easily scalable to PostgreSQL in production)
-- **API**: RESTful design with JSON responses and security features
-- **Frontend**: React.js with Material-UI for a modern, responsive interface
+This system allows healthcare workers to:
 
-## 🚀 How to Run It
+1. **Create health programs** (TB, Malaria, HIV, etc.) - Set up specialized care programs with custom attributes
+2. **Register clients** into the system - Capture essential demographic and health information
+3. **Enroll clients** in one or more health programs - Track participation across multiple health initiatives
+4. **Search for clients** from the registered list - Find patients quickly with powerful search functionality
+5. **View client profiles** including enrolled programs - Comprehensive patient information in one place
+6. **Access client data via API** for external system integration - Secure data sharing with authorized systems
+
+## Technology Stack
+
+- **Backend**: Python with FastAPI, SQLite database (easily scalable to PostgreSQL)
+- **API**: RESTful with JSON responses, key-based authentication
+- **Frontend**: To be implemented (planned with React.js)
+- **Security**: Input validation, data encryption for sensitive information
+
+## Setup Instructions
 
 ### Backend Setup
 
@@ -54,46 +44,30 @@ CEMA BHIS/
    - Python 3.8+
    - pip
 
-2. **Installing dependencies:**
+2. **Install backend dependencies:**
    ```bash
    cd backend
    pip install -r requirements.txt
    ```
 
-3. **Database setup:**
-   I configured the database in `backend/.env`:
+3. **Database configuration:**
+   The database configuration is in `backend/.env`:
    ```
    DATABASE_URL=sqlite:///bhis.db
    API_KEY=dev_api_key_for_testing
    ```
 
-4. **Running the server:**
+4. **Run the application:**
    ```bash
    cd backend
    python run.py
    ```
-   - Access API documentation: http://localhost:8000/docs
+
+5. **Access the API:**
+   - API documentation: http://localhost:8000/docs
    - API base URL: http://localhost:8000/
 
-### Frontend Setup
-
-1. **Prerequisites:**
-   - Node.js 14+
-   - npm or yarn
-
-2. **Installing dependencies:**
-   ```bash
-   cd frontend
-   npm install
-   ```
-
-3. **Running the dev server:**
-   ```bash
-   npm start
-   ```
-   - View the app: http://localhost:3000
-
-## 🧪 Testing My Code
+## Testing
 
 ```bash
 # Run all tests
@@ -103,60 +77,35 @@ python -m pytest tests/test_bhis.py -v
 python -m pytest tests/test_bhis.py -k "api" -v    # API tests
 python -m pytest tests/test_bhis.py -k "program" -v  # Program tests
 python -m pytest tests/test_bhis.py -k "client" -v   # Client tests
-
-# Frontend tests
-cd frontend
-npm test
 ```
 
-## 🔗 API Endpoints
-
-I designed these endpoints to cover the core functionality:
+## API Endpoints
 
 - **Programs:**
-  - `POST /programs/` - Create a program
+  - `POST /programs/` - Create a health program
   - `GET /programs/` - List all programs
 
 - **Clients:**
   - `POST /clients/` - Register a client
-  - `GET /clients/?search=<term>` - Search for clients
-  - `GET /clients/{client_id}` - View a client profile
+  - `GET /clients/?search=<name>` - List/search clients
+  - `GET /clients/{client_id}` - View client profile
 
 - **Enrollments:**
-  - `POST /clients/{client_id}/enrollments/` - Enroll a client in a program
+  - `POST /clients/{client_id}/enrollments/` - Enroll client in program
 
-- **External API (requires authentication):**
-  - `GET /api/clients/{client_id}` - Get client data securely
+- **External API (requires API key):**
+  - `GET /api/clients/{client_id}` - Get client profile via API
 
-## 🔒 Security Implementation
+## Security Implementation
 
 - API endpoints protected with key-based authentication
-- Input validation to prevent SQL injection and XSS attacks
-- Data encryption for sensitive client information
-- Role-based access control
-- HTTPS support for secure data transmission
+- Input validation to prevent SQL injection and other attacks
+- Designed with data privacy considerations for healthcare information
+- Role-based access control for different user types
 
-## 🚀 Deployment
+## 📞 Contact Information
 
-The app can be deployed using Docker:
+For questions or collaboration on this project:
 
-```bash
-docker-compose up
-```
-
-## 📝 Development Approach
-
-Throughout this project, I focused on:
-- Writing clean, maintainable code
-- Taking an API-first approach
-- Creating an intuitive workflow for healthcare users
-- Implementing robust security measures
-- Building an extensible architecture
-
-## 📜 License
-
-This project is licensed under the MIT License.
-
-## 📞 Contact
-
-Feel free to reach out if you have questions about my project or development process!
+- 📧 Email: mathwaquerufus@gmail.com
+- 📱 Phone: +254758503824
