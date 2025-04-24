@@ -110,6 +110,14 @@ const ClientDetail = () => {
               </p>
             </div>
             <div>
+              <h3 className="text-sm font-medium text-gray-500">Gender</h3>
+              <p className="mt-1 text-lg text-gray-900">
+                {client.gender 
+                  ? client.gender.charAt(0).toUpperCase() + client.gender.slice(1) 
+                  : 'Not specified'}
+              </p>
+            </div>
+            <div>
               <h3 className="text-sm font-medium text-gray-500">Contact Information</h3>
               <p className="mt-1 text-lg text-gray-900">
                 {client.contact_info || 'Not provided'}

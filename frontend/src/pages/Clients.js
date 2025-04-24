@@ -18,6 +18,7 @@ const Clients = () => {
     name: '',
     date_of_birth: '',
     contact_info: '',
+    gender: '',
   });
 
   const columns = [
@@ -29,6 +30,11 @@ const Clients = () => {
       cell: (row) => new Date(row.date_of_birth).toLocaleDateString()
     },
     { header: 'Contact Info', accessor: 'contact_info' },
+    { 
+      header: 'Gender', 
+      accessor: 'gender',
+      cell: (row) => row.gender ? row.gender.charAt(0).toUpperCase() + row.gender.slice(1) : 'Not specified'
+    },
     {
       header: 'Programs Enrolled',
       accessor: 'enrollments',
@@ -59,7 +65,7 @@ const Clients = () => {
     e.preventDefault();
     try {
       await clientsApi.create(formData);
-      setFormData({ name: '', date_of_birth: '', contact_info: '' });
+      setFormData({ name: '', date_of_birth: '', contact_info: '', gender: '' });
       setShowForm(false);
       fetchClients();
     } catch (error) {
@@ -110,6 +116,23 @@ const Clients = () => {
             onChange={handleInputChange}
             required
           />
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="gender">
+              Gender
+            </label>
+            <select
+              id="gender"
+              name="gender"
+              value={formData.gender}
+              onChange={handleInputChange}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            >
+              <option value="">Select Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
           <Input
             label="Contact Information"
             id="contact_info"

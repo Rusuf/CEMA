@@ -1,8 +1,14 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, UniqueConstraint, func
+from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, UniqueConstraint, func, Enum
 from sqlalchemy.orm import relationship, joinedload
 from datetime import date, datetime
+import enum
 
 from ..database.database import Base
+
+class Gender(str, enum.Enum):
+    male = "male"
+    female = "female"
+    other = "other"
 
 class Client(Base):
     __tablename__ = "clients"
@@ -11,6 +17,7 @@ class Client(Base):
     name = Column(String, nullable=False)
     date_of_birth = Column(Date, nullable=False)
     contact_info = Column(String, nullable=True)
+    gender = Column(Enum(Gender), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     

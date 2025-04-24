@@ -1,6 +1,13 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import date
+from enum import Enum
+
+# Gender enum
+class GenderEnum(str, Enum):
+    male = "male"
+    female = "female"
+    other = "other"
 
 # Program schemas
 class ProgramBase(BaseModel):
@@ -21,6 +28,7 @@ class ClientBase(BaseModel):
     name: str
     date_of_birth: date
     contact_info: Optional[str] = None
+    gender: Optional[GenderEnum] = None
 
 class ClientCreate(ClientBase):
     pass

@@ -3,8 +3,8 @@ from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 from datetime import date, datetime
 
-from ..models.models import Program, Client, Enrollment
-from ..models.schemas import ProgramCreate, ClientCreate, ProgramEnrollment, EnrollmentCreate, ClientProfile
+from ..models.models import Program, Client, Enrollment, Gender
+from ..models.schemas import ProgramCreate, ClientCreate, ProgramEnrollment, EnrollmentCreate, ClientProfile, GenderEnum
 
 class ProgramService:
     @staticmethod
@@ -44,10 +44,21 @@ class ClientService:
     @staticmethod
     def create_client(db: Session, client: ClientCreate):
         """Register a new client"""
+        # Convert string gender value to enum
+        gender_val = None
+        if client.gender:
+            if client.gender == "male":
+                gender_val = Gender.male
+            elif client.gender == "female":
+                gender_val = Gender.female
+            elif client.gender == "other":
+                gender_val = Gender.other
+            
         db_client = Client(
             name=client.name,
             date_of_birth=client.date_of_birth,
-            contact_info=client.contact_info
+            contact_info=client.contact_info,
+            gender=gender_val
         )
         db.add(db_client)
         db.commit()
@@ -87,6 +98,7 @@ class ClientService:
             "name": client.name, 
             "date_of_birth": client.date_of_birth,
             "contact_info": client.contact_info,
+            "gender": client.gender.value if client.gender else None,
             "enrollments": enrollments
         }
         return client_data
@@ -161,6 +173,7 @@ class ClientService:
             name=db_client.name,
             date_of_birth=db_client.date_of_birth,
             contact_info=db_client.contact_info,
+            gender=db_client.gender.value if db_client.gender else None,
             enrollments=program_enrollments
         )
 
