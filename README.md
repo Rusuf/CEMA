@@ -1,12 +1,26 @@
-# CEMA
-
-# Basic Health Information System (BHIS) Prototype
+# CEMA - Basic Health Information System
 
 A lightweight health information system for managing clients and health programs/services.
 
+## Project Structure
+
+```
+CEMA/
+├── README.md            # Project overview (this file)
+├── backend/             # Backend code and documentation
+│   ├── .env             # Environment configuration
+│   ├── bhis.db          # SQLite database
+│   ├── docs/            # Documentation files
+│   ├── requirements.txt # Python dependencies
+│   ├── run.py           # Application entry point
+│   ├── scripts/         # Utility scripts
+│   └── src/             # Source code
+└── frontend/            # Frontend code (to be implemented)
+```
+
 ## Features
 
-Allows doctors to:
+This system allows healthcare workers to:
 
 1. **Create health programs** (TB, Malaria, HIV, etc.)
 2. **Register clients** into the system
@@ -15,34 +29,15 @@ Allows doctors to:
 5. **View client profiles** including enrolled programs
 6. **Access client data via API** for external system integration
 
-## Technology
+## Technology Stack
 
-- **Backend**: Python with FastAPI
-- **Database**: SQLite
+- **Backend**: Python with FastAPI, SQLite database
 - **API**: RESTful with JSON responses
-
-## Project Structure
-
-```
-CEMA/
-├── README.md
-├── backend/            # Backend code
-│   ├── .env            # Environment configuration
-│   ├── requirements.txt # Python dependencies
-│   ├── scripts/        # Utility scripts
-│   │   └── setup_db.py # Database setup script
-│   └── src/            # Source code
-│       ├── main.py     # Application entry point
-│       └── app/        # Application modules
-│           ├── main.py # FastAPI application
-│           ├── database/
-│           ├── models/
-│           ├── routes/
-│           └── services/
-└── frontend/           # Frontend code (to be added)
-```
+- **Frontend**: To be implemented
 
 ## Setup Instructions
+
+### Backend Setup
 
 1. **Prerequisites:**
    - Python 3.8+
@@ -54,7 +49,7 @@ CEMA/
    pip install -r requirements.txt
    ```
 
-3. **Configure database:**
+3. **Database configuration:**
    The database configuration is in `backend/.env`:
    ```
    DATABASE_URL=sqlite:///bhis.db
@@ -70,14 +65,6 @@ CEMA/
 5. **Access the API:**
    - API documentation: http://localhost:8000/docs
    - API base URL: http://localhost:8000/
-
-## Testing
-
-Run tests with:
-```bash
-cd backend
-pytest
-```
 
 ## API Endpoints
 
