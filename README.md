@@ -67,6 +67,27 @@ This system allows healthcare workers to:
    - 📚 API documentation: http://localhost:8000/docs
    - 🔗 API base URL: http://localhost:8000/
 
+### 🖥️ Frontend Setup
+
+1. **Prerequisites:**
+   - Node.js v14+ (https://nodejs.org/)
+
+2. **Install frontend dependencies:**
+   ```bash
+   cd frontend
+   npm install
+   ```
+
+3. **Run the frontend app:**
+   ```bash
+   npm start
+   ```
+
+4. **Access the frontend:**
+   - 🌐 http://localhost:3000
+
+> ⚠️ The backend server should be running at http://localhost:8000 for full functionality.
+
 ## 🧪 Testing
 
 ```bash
